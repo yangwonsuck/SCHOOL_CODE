@@ -1,0 +1,152 @@
+#include<stdio.h>//C언어를 사용하기 위한 헤더파일
+#include<windows.h>//시간 지연함수를 사용하기 위한 헤더파일,커서이동을 위한 헤더파일
+void first_print(void);//초기 상태를 지정해주기 위한 함수 선언
+void input_coin(int coin);//동전을 넣었을때의 출력값을 보여주기 위한 함수 선언
+void input_menu(int menu);//커피메뉴에 따른 출력과정들을 보여주기 위한 함수 선언
+void gotoxy(int x, int y);//커서를 지정된 위치에 위치시키기위한 함수 선언
+int main()
+{
+	int coin;//int형으로 coin변수 선언
+	int menu;//int형으로 menu변수 선언
+	while (1)//무한 루프 동작
+	{
+		first_print();//초기 상태 출력
+		gotoxy(9, 1);//커서를 지정된 위치에 이동하는 함수선언
+		coin = getchar();//coin값을 입력해주기 위해 getchar()함수 기입
+		input_coin(coin);//동전 넣었을때 coin값에 따라 출력
+		getchar();//버퍼 용도로 뒤에 있는 입력값이 넘어가는 것을 방지하기 위해 사용
+		menu = getchar();//menu값을 입력해주기 위해 getchar()함수 기입
+		input_menu(menu);//menu값을 입력했을때 그에따라 출력
+		getchar();//버퍼 용도로 무한루프를 진행하므로 입력값이 넘어가는 것을 방지하기 위해 사용
+	}
+	return 0;
+}
+void first_print(void)//초기 상태 출력함수 정의
+{
+	printf("Coin(C):X\n");
+	printf("Coffee:X\n");
+	printf("Operation:X\n");
+}
+void input_coin(int coin)//코인 입력시 출력값 정의
+{
+	if (coin == 'C')//C입력시 출력
+	{
+		printf("Coin(C):%c\n", coin);
+		printf("Coffee:X\n");
+		printf("Operation:X\n");
+	}
+	else if (coin == 'c')//c입력시 출력
+	{
+		printf("Coin(C):%c\n", coin);
+		printf("Coffee:X\n");
+		printf("Operation:X\n");
+	}
+	else//그외에 것 입력시 동전을 투입 멘트 출력
+	{
+		printf("동전을 투입하시오.\n");
+	}
+}
+void input_menu(int menu)//menu입력시 시간에 따른 출력값을 내기 위해 함수 정의
+{
+	if (menu == 'S')//S입력시 순차적 출력
+	{
+		printf("Coin(C):C\n");
+		printf("Coffee:Sugar\n");
+		printf("Operation:X\n");
+		Sleep(1000);//1s 시간 지연
+		printf("Coin(C):C\n");
+		printf("Coffee:Sugar\n");
+		printf("Operation:Cup\n");
+		Sleep(1000);
+		printf("Coin(C):C\n");
+		printf("Coffee:Sugar\n");
+		printf("Operation:Sugar\n");
+		Sleep(1000);
+		printf("Coin(C):C\n");
+		printf("Coffee:Sugar\n");
+		printf("Operation:Coffee\n");
+		Sleep(1000);
+		printf("Coin(C):C\n");
+		printf("Coffee:Sugar\n");
+		printf("Operation:Water\n");
+		Sleep(2000);//2s 시간 지연
+	}
+	else if (menu == 'B')//B입력시 순차적 출력
+	{
+		printf("Coin(C):C\n");
+		printf("Coffee:Black\n");
+		printf("Operation:X\n");
+		Sleep(1000);
+		printf("Coin(C):C\n");
+		printf("Coffee:Black\n");
+		printf("Operation:Cup\n");
+		Sleep(1000);
+		printf("Coin(C):C\n");
+		printf("Coffee:Black\n");
+		printf("Operation:Coffee\n");
+		Sleep(1000);
+		printf("Coin(C):C\n");
+		printf("Coffee:Black\n");
+		printf("Operation:Water\n");
+		Sleep(2000);
+	}
+	else if (menu == 'C')//C입력시 순차적 출력
+	{
+		printf("Coin(C):C\n");
+		printf("Coffee:Cream\n");
+		printf("Operation:X\n");
+		Sleep(1000);
+		printf("Coin(C):C\n");
+		printf("Coffee:Cream\n");
+		printf("Operation:Cup\n");
+		Sleep(1000);
+		printf("Coin(C):C\n");
+		printf("Coffee:Cream\n");
+		printf("Operation:Cream\n");
+		Sleep(1000);
+		printf("Coin(C):C\n");
+		printf("Coffee:Cream\n");
+		printf("Operation:Coffee\n");
+		Sleep(1000);
+		printf("Coin(C):C\n");
+		printf("Coffee:Cream\n");
+		printf("Operation:Water\n");
+		Sleep(2000);
+	}
+	else if (menu == 'M')//M입력시 순차적 출력
+	{
+		printf("Coin(C):C\n");
+		printf("Coffee:Milk\n");
+		printf("Operation:X\n");
+		Sleep(1000);
+		printf("Coin(C):C\n");
+		printf("Coffee:Milk\n");
+		printf("Operation:Cup\n");
+		Sleep(1000);
+		printf("Coin(C):C\n");
+		printf("Coffee:Milk\n");
+		printf("Operation:Sugar\n");
+		Sleep(1000);
+		printf("Coin(C):C\n");
+		printf("Coffee:Milk\n");
+		printf("Operation:Cream\n");
+		Sleep(1000);
+		printf("Coin(C):C\n");
+		printf("Coffee:Milk\n");
+		printf("Operation:Coffee\n");
+		Sleep(1000);
+		printf("Coin(C):C\n");
+		printf("Coffee:Milk\n");
+		printf("Operation:Water\n");
+		Sleep(2000);
+	}
+	else
+	{
+		printf("\n");//그 외에것 입력시 빈칸 출력
+	}
+}
+void gotoxy(int x, int y)//커서를 지정된 위치에 위치시키기 위한 함수 정의
+{
+	COORD pos = { x - 1, y - 1 };
+	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
+}
