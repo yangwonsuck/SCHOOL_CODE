@@ -1,0 +1,124 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <windows.h>
+#include <process.h> 
+#pragma comment(lib, "ws2_32.lib")	
+#define PORT 50000
+#define BUFFERSIZE 255
+#define NAMESIZE 10
+
+unsigned threadID;
+HANDLE hMutex;
+int allClientSocket[100];
+int clientNumber = 0;
+ 
+unsigned __stdcall broadcastAllClient(void *arg)
+{
+    char cliBuf[NAMESIZE+BUFFERSIZE];
+    int mClientSocket = (int)arg;
+    int i;
+ 
+    while(1)
+    {
+        memset(cliBuf,0, sizeof(cliBuf));
+        if(recv(mClientSocket, cliBuf, sizeof(cliBuf), 0) <= 0)
+            break;
+		else
+		{
+				 printf("%s\n", cliBuf);
+		}
+        WaitForSingleObject(hMutex, INFINITE);
+        for(i=0; i < clientNumber; ++i)
+        {
+            if(allClientSocket[i] != mClientSocket)
+                send(allClientSocket[i], cliBuf, sizeof(cliBuf), 0);
+        }
+        ReleaseMutex(hMutex);
+    }
+ 
+    WaitForSingleObject(hMutex, INFINITE);
+    for(i=0; i < clientNumber; ++i)
+    {
+        if(allClientSocket[i] == mClientSocket)
+        {
+            for(; i < clientNumber; ++i)
+                allClientSocket[i] = allClientSocket[i+1];
+            break;
+        }
+    }
+    --clientNumber;
+    ReleaseMutex(hMutex);
+    closesocket(mClientSocket);
+    return 0;
+}
+ 
+int main(int argc, char* argv[])
+{
+
+    HANDLE hThread;
+    unsigned threadID;
+    int addrlen = 0;
+    hMutex = CreateMutex(NULL, FALSE, NULL);
+    char greetMessage[BUFFERSIZE];
+    memset(greetMessage,0, sizeof(greetMessage));
+
+    WSADATA wsData;
+    if(WSAStartup(MAKEWORD(2,2), &wsData) != 0)
+    {
+        printf("WSAStartup() error!");
+        return -1;
+    }
+	printf("369게임을 시작합니다.\n");
+	printf("=======================================\n");
+    SOCKET serverSock = socket(AF_INET, SOCK_STREAM, 0);
+    SOCKET clientSock;
+    if(serverSock == INVALID_SOCKET)
+    {
+        printf("socket() error.");
+        return -1;
+    }
+ 
+    SOCKADDR_IN serverAddr;
+    SOCKADDR_IN clientAddr;
+    memset(&serverAddr,0, sizeof(serverAddr));
+    memset(&clientAddr,0, sizeof(clientAddr));
+    serverAddr.sin_family = AF_INET;
+	serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    serverAddr.sin_port = htons(PORT);
+    
+ 
+    if(bind(serverSock, (SOCKADDR*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR)
+    {
+        printf("bind() error.");
+        return -1;
+    }
+ 
+    if(listen(serverSock, SOMAXCONN) == SOCKET_ERROR)
+    {
+        printf("listen() error.");
+        return -1;
+    }
+    while(1)
+    {
+        addrlen = sizeof(clientAddr);
+        clientSock = accept(serverSock, (SOCKADDR*)&clientAddr, &addrlen);
+        if(clientSock == INVALID_SOCKET)
+        {
+            printf("accept() error.");
+            continue;
+        }
+        WaitForSingleObject(hMutex, INFINITE);
+        ++clientNumber;
+        printf("Client %d 연결되었다.\n", clientNumber);
+        allClientSocket[clientNumber-1] = clientSock;
+        ReleaseMutex(hMutex);
+        send(clientSock, greetMessage, sizeof(greetMessage), 0);
+        _beginthreadex(NULL, 0, broadcastAllClient, (void *)clientSock, 0, &threadID);
+    }
+
+    closesocket(serverSock);
+    WSACleanup();
+    CloseHandle(hMutex);
+    return 0;
+}
