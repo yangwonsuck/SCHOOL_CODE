@@ -1,0 +1,343 @@
+#include <stdio.h> 
+#include <stdlib.h>
+#include <string.h>
+#include <conio.h>
+#define _CRT_SECURE_NO_WARNINGS
+#define MAX_SIZE 10  //반복하고자 하는 사이즈
+#define TIME_QUANTUM 20 //도착시간을 타임간격으로 20으로 지정
+typedef int element;
+typedef struct DListNode {  //구조체 선언
+	// 이중연결 노드 타입
+	element process_id;    //프로세스 id 변수 선언 
+	element priority;      //우선순위를 나타내는 변수선언
+	element computing_time;   //실행시간을 나타내는 변수 선언
+	element turnaround_time;   //종료시간을 구하기 위한 변수 선언
+	element type;   //현재 어떤 동작을 하는지 알기 위한 변수 선언
+	struct DListNode* llink;   //이중연결리스트의 왼쪽 노드
+	struct DListNode* rlink;   //이중연결리스트의 오른쪽 노드
+} DListNode; 
+DListNode *start = NULL;   //start노드 선언
+int cnt = 0;  
+void Swap(int arr[],int a,int b)   //퀵정렬의 교환을 하기 위한 함수
+{
+	int temp=arr[a];
+	arr[a]=arr[b];
+	arr[b]=temp;
+}
+int Partition(int arr[],int left,int right)  //피벗을 통한 정렬을 하기위한 함수
+{
+	int pivot=arr[left];
+	int low=left+1;
+	int high=right;
+
+	while(low<=high)
+	{
+		while(pivot>=arr[low]&&low<=right)
+		{
+			low++;
+		}
+		while(pivot<=arr[high]&&high>=(left+1))
+		{
+			high--;
+		}
+		if(low<= high)
+		{
+			Swap(arr,low,high);
+		}
+	}
+	Swap(arr,left,high);
+	return high;
+}
+void QuickSort(int arr[],int left,int right)  //퀵정렬의 함수
+{
+	if(left<=right)
+	{
+		int pivot=Partition(arr,left,right);
+		QuickSort(arr,left,pivot-1);
+		QuickSort(arr,pivot+1,right);
+	}
+}
+void init(DListNode* phead)  //초기화하기 위한 함수
+{
+	phead->llink = phead;
+	phead->rlink = phead; 
+}
+void print_dlist(DListNode* phead) {  //변수의 값들을 print하기위한 함수
+	DListNode* p;
+	FILE *fp; //파일을 받기 위한 포인터 선언
+	fp=fopen("C:\\Users\\LENOVO\\Desktop\\ConsoleApplication5\\test.txt","wt"); //경로를 이용해서 txt파일 읽기
+	for (p = phead->rlink; p != phead; p = p->rlink)
+	{
+		printf("%d\t\t%d\t\t%d\t\t%d\n",p->process_id,p->priority,p->computing_time,p->turnaround_time);
+	}
+}
+void dinsert(DListNode *before, element data1,element data2,element data3,element data4) //process_id,priority,computing_time,turnaround_time 순으로 출력
+{
+	DListNode *newnode = (DListNode *)malloc(sizeof(DListNode));
+	newnode->process_id=data1;
+	newnode->priority=data2;
+	newnode->computing_time=data3;
+	newnode->turnaround_time=data4;
+	newnode->llink = before;
+	newnode->rlink = before->rlink;
+	before->rlink->llink = newnode;
+	before->rlink = newnode;
+}
+
+int main(void) 
+{
+	FILE *fp;  //파일 출력을 위한 포인터 선언
+	fp=fopen("C:\\Users\\LENOVO\\Desktop\\ConsoleApplication5\\test.txt","rt"); //경로에 나타난 txt파일 읽기
+	DListNode* head1 = (DListNode *)malloc(sizeof(DListNode));//동적할당으로 head1 생성
+	DListNode* head2 = (DListNode *)malloc(sizeof(DListNode));//동적할당으로 head2 생성
+	DListNode* head3 = (DListNode *)malloc(sizeof(DListNode));//동적할당으로 head3 생성
+	DListNode* head4 = (DListNode *)malloc(sizeof(DListNode));//동적할당으로 head4 생성
+	DListNode* head5 = (DListNode *)malloc(sizeof(DListNode));//동적할당으로 head5 생성
+	DListNode* head6 = (DListNode *)malloc(sizeof(DListNode));//동적할당으로 head6 생성
+	DListNode* head7 = (DListNode *)malloc(sizeof(DListNode));//동적할당으로 head7 생성
+	DListNode* head8 = (DListNode *)malloc(sizeof(DListNode));//동적할당으로 head8 생성
+	DListNode* head9 = (DListNode *)malloc(sizeof(DListNode));//동적할당으로 head9 생성
+	DListNode* head10 = (DListNode *)malloc(sizeof(DListNode));//동적할당으로 head10 생성
+	init(head1);//head1 초기화
+	init(head2);//head2 초기화
+	init(head3);//head3 초기화
+	init(head4);//head4 초기화
+	init(head5);//head5 초기화
+	init(head6);//head6 초기화
+	init(head7);//head7 초기화
+	init(head8);//head8 초기화
+	init(head9);//head9 초기화
+	init(head10);//head10 초기화
+		int m1,m2,m3,k1,t1; //처음 head1에 저장하기위한 변수값들 입력하기 위한 변수 선언
+		int arrival_time1;   //첫번째 arrival_time 선언
+		arrival_time1=0;      //첫번째 arrival_time 초기화
+		fscanf_s(fp,"%d",&t1);   //type 읽기
+		fscanf_s(fp,"%d",&m1);    //process_id 읽기
+		fscanf_s(fp,"%d",&m2);    //priority읽기
+	    fscanf_s(fp,"%d",&m3);    //computing_time 읽기
+		k1=m3;                 //첫번째 turnaround_time에 computing_time 저장
+		dinsert(head1, m1,m2,m3,k1);   //dinsert함수로 head1에 각각 입력된 내용 연결
+		int m4,m5,m6,k2,t2; //처음 head2에 저장하기위한 변수값들 입력하기 위한 변수 선언
+		fscanf_s(fp,"%d",&t2); //type 읽기
+		fscanf_s(fp,"%d",&m4); //process_id 읽기
+		fscanf_s(fp,"%d",&m5); //priority읽기
+	    fscanf_s(fp,"%d",&m6); //computing_time 읽기
+		k2=k1+m6;               //두번째 turnaround_time에 첫번째 turnaround_time과 첫번째 computing_time 더한거 저장
+		dinsert(head2, m4,m5,m6,k2);   //dinsert함수로 head2에 각각 입력된 내용 연결
+		int m7,m8,m9,k3,t3;    //처음 head3에 저장하기위한 변수값들 입력하기 위한 변수 선언
+		fscanf_s(fp,"%d",&t3); //type 읽기
+		fscanf_s(fp,"%d",&m7);  //process_id 읽기
+		fscanf_s(fp,"%d",&m8);  //priority읽기
+	    fscanf_s(fp,"%d",&m9);  //computing_time 읽기
+		k3=k2+m9;   //세번째 turnaround_time에 두번째 turnaround_time과 두번째 computing_time 더한거 저장
+		dinsert(head3 ,m7,m8,m9,k3);  //dinsert함수로 head3에 각각 입력된 내용 연결
+		int p1,p2,p3,p4;   
+		fscanf_s(fp,"%d",&p1);
+		fscanf_s(fp,"%d",&p2);
+		fscanf_s(fp,"%d",&p3);
+	    fscanf_s(fp,"%d",&p4);
+		int arrival_time2;   //arrival_time 2 변수 선언
+		arrival_time2=TIME_QUANTUM;  //arrival_time2 정의
+		int m10,m11,m12,k4,t4;    //처음 head4에 저장하기위한 변수값들 입력하기 위한 변수 선언
+		fscanf_s(fp,"%d",&t4);   //type 읽기
+		fscanf_s(fp,"%d",&m10);  //process_id 읽기
+		fscanf_s(fp,"%d",&m11);  //priority읽기
+	    fscanf_s(fp,"%d",&m12);  //computing_time 읽기
+		k4=k3+m12;    //네번째 turnaround_time에 세번째 turnaround_time과 세번째 computing_time 더한거 저장
+		dinsert(head4, m10,m11,m12,k4);  //dinsert함수로 head4에 각각 입력된 내용 연결
+		int m13,m14,m15,k5,t5;  //처음 head5에 저장하기위한 변수값들 입력하기 위한 변수 선언
+		fscanf_s(fp,"%d",&t5); //type 읽기
+		fscanf_s(fp,"%d",&m13);  //process_id 읽기
+		fscanf_s(fp,"%d",&m14);  //priority읽기
+	    fscanf_s(fp,"%d",&m15);  //computing_time 읽기
+		k5=k4+m15;   //다섯번째 turnaround_time에 네번째 turnaround_time과 네번째 computing_time 더한거 저장
+		dinsert(head5, m13,m14,m15,k5);  //dinsert함수로 head5에 각각 입력된 내용 연결
+		int m16,m17,m18,k6,t6;  //처음 head6에 저장하기위한 변수값들 입력하기 위한 변수 선언
+		fscanf_s(fp,"%d",&t6);  //type 읽기
+		fscanf_s(fp,"%d",&m16);  //process_id 읽기
+		fscanf_s(fp,"%d",&m17);  //priority읽기
+	    fscanf_s(fp,"%d",&m18);  //computing_time 읽기
+		k6=k5+m18;  //여섯번째 turnaround_time에 다섯번째 turnaround_time과 다섯번째 computing_time 더한거 저장
+		dinsert(head6, m16,m17,m18,k6);  //dinsert함수로 head6에 각각 입력된 내용 연결
+		int p5,p6,p7,p8;
+		int arrival_time3=TIME_QUANTUM*2;  //arrival_time3 정의 및 선언
+		fscanf_s(fp,"%d",&p5);
+		fscanf_s(fp,"%d",&p6);
+		fscanf_s(fp,"%d",&p7);
+	    fscanf_s(fp,"%d",&p8);
+		int m19,m20,m21,k7,t7;   //처음 head7에 저장하기위한 변수값들 입력하기 위한 변수 선언
+		fscanf_s(fp,"%d",&t7);  //type 읽기
+		fscanf_s(fp,"%d",&m19);  //process_id 읽기
+		fscanf_s(fp,"%d",&m20);  //priority읽기
+	    fscanf_s(fp,"%d",&m21);  //computing_time 읽기
+		k7=k6+m21;  //일곱번째 turnaround_time에 여섯번째 turnaround_time과 여섯번째 computing_time 더한거 저장
+		dinsert(head7, m19,m20,m21,k7);  //dinsert함수로 head7에 각각 입력된 내용 연결
+		int m22,m23,m24,k8,t8;  //처음 head8에 저장하기위한 변수값들 입력하기 위한 변수 선언
+		fscanf_s(fp,"%d",&t8); //type 읽기
+		fscanf_s(fp,"%d",&m22); //process_id 읽기
+		fscanf_s(fp,"%d",&m23); //priority읽기
+	    fscanf_s(fp,"%d",&m24); //computing_time 읽기
+		k8=k7+m24;  //여덟번째 turnaround_time에 일곱번째 turnaround_time과 일곱번째 computing_time 더한거 저장
+		dinsert(head8, m22,m23,m24,k8);  //dinsert함수로 head8에 각각 입력된 내용 연결
+		int m25,m26,m27,k9,t9; //처음 head9에 저장하기위한 변수값들 입력하기 위한 변수 선언
+		fscanf_s(fp,"%d",&t9); //type 읽기
+		fscanf_s(fp,"%d",&m25); //process_id 읽기
+		fscanf_s(fp,"%d",&m26); //priority읽기
+	    fscanf_s(fp,"%d",&m27); //computing_time 읽기
+		k9=k8+m27;  //아홉번째 turnaround_time에 여덟번째 turnaround_time과 여덟번째 computing_time 더한거 저장
+		dinsert(head9, m25,m26,m27,k9); //dinsert함수로 head9에 각각 입력된 내용 연결
+		int p9,p10,p11,p12;
+		fscanf_s(fp,"%d",&p9);
+		fscanf_s(fp,"%d",&p10);
+		fscanf_s(fp,"%d",&p11);
+	    fscanf_s(fp,"%d",&p12);
+		int m28,m29,m30,k10,t10; //처음 head10에 저장하기위한 변수값들 입력하기 위한 변수 선언
+		int arrival_time4=TIME_QUANTUM*3; //arrival_time4 정의 및 선언
+		fscanf_s(fp,"%d",&t10); //type 읽기
+		fscanf_s(fp,"%d",&m28); //process_id 읽기
+		fscanf_s(fp,"%d",&m29); //priority읽기
+	    fscanf_s(fp,"%d",&m30); //computing_time 읽기
+		k10=k9+m30; //열번째 turnaround_time에 아홉번째 turnaround_time과 아홉번째 computing_time 더한거 저장
+		dinsert(head10, m28,m29,m30,k10); //dinsert함수로 head10에 각각 입력된 내용 연결
+		int p13;
+		fscanf_s(fp,"%d",&p13);
+		int a1=m2,a2=m5,a3=m8,a4=m11,a5=m14,a6=m17,a7=m20,a8=m23,a9=m26,a10=m29;
+		int array[10]={a1,a2,a3,a4,a5,a6,a7,a8,a9,a10};  //새로운 array[10] 선언 및 정의
+		int array2[10]; //새로운 array2선언
+		QuickSort(array,0,9); //퀵정렬을 통한 priority 정렬
+		for(int i=0;i<10;i++)
+		{
+			array2[i]=array[i]; //array2에 정렬
+		}
+		int s1,s2,s3,s4,s5,s6,s7,s8,s9,s10; //새로운 s1~s10까지 선언
+		int normal;  //normal 선언
+		s1=m6;
+		s2=s1+m21;
+		s3=s2+m9;
+		s4=s3+m12;
+		s5=s4+m27;
+		s6=s5+m24;
+		s7=s6+m9;
+		s8=s7+m30;
+		s9=s8+m3;
+		s10=s9+m18;
+		int b1=0,b2=0,b3=0,b4=0,b5=0,b6=0,b7=0,b8=0,b9=0,b10=0; //b1~b10 선언 및 정의
+		b1=array2[0]; //b1에 array2[0]값 지정
+		b2=array2[1]; //b2에 array2[1]값 지정
+		b3=array2[2]; //b3에 array2[2]값 지정
+		b4=array2[3]; //b4에 array2[3]값 지정
+		b5=array2[4]; //b5에 array2[4]값 지정
+		b6=array2[5]; //b6에 array2[5]값 지정
+		b7=array2[6]; //b7에 array2[6값 지정
+		b8=array2[7]; //b8에 array2[7]값 지정
+		b9=array2[8]; //b9에 array2[8]값 지정
+		b10=array2[9]; //b10에 array2[9]값 지정
+		init(head1);
+		init(head2);
+		init(head3);
+		init(head4);
+		init(head5);
+		init(head6);
+		init(head7);
+		init(head8);
+		init(head9);
+		init(head10);
+		int ret_time1;  //반환시간1을 ret_time1로 선언 
+		ret_time1=s1-arrival_time1; //ret_time1을 정의
+		int service_time1;  //서비스시간 1을 선언
+		service_time1=m6; //서비스시간1을 정의
+		double normal1;  //normal1을 정의
+		normal1=ret_time1/service_time1; //normal1을 정의
+		int ret_time2;  //반환시간2을 ret_time2로 선언 
+		ret_time2=s2-arrival_time1; //ret_time2을 정의
+		int service_time2; //서비스시간 2을 선언
+		service_time2=m21; //서비스시간2을 정의
+		double normal2; //normal2을 정의
+		normal2=ret_time2/service_time2; //normal2을 정의
+		int ret_time3;
+		ret_time3=s3-arrival_time1;
+		int service_time3;
+		service_time3=m9;
+		double normal3;
+		normal3=ret_time3/service_time3;
+		int ret_time4;
+		ret_time4=s4-arrival_time2;
+		int service_time4;
+		service_time4=m12;
+		double normal4;
+		normal4=ret_time4/service_time4;
+		int ret_time5;
+		ret_time5=s5-arrival_time2;
+		int service_time5;
+		service_time5=m27;
+		double normal5;
+		normal5=ret_time5/service_time5;
+		int ret_time6;
+		ret_time6=s6-arrival_time2;
+		int service_time6;
+		service_time6=m24;
+		double normal6;
+		normal6=ret_time6/service_time6;
+		int ret_time7;
+		ret_time7=s7-arrival_time3;
+		int service_time7;
+		service_time7=m9;
+		double normal7;
+		normal7=ret_time7/service_time7;
+		int ret_time8;
+		ret_time8=s8-arrival_time3;
+		int service_time8;
+		service_time8=m30;
+		double normal8;
+		normal8=ret_time8/service_time8;
+		int ret_time9;
+		ret_time9=s9-arrival_time3;
+		int service_time9;
+		service_time9=m3;
+		double normal9;
+		normal9=ret_time9/service_time9;
+		int ret_time10;
+		ret_time10=s10-arrival_time4;
+		int service_time10;
+		service_time10=m18;
+		double normal10;
+		normal10=ret_time10/service_time10;
+
+		dinsert(head1, m22,b1,m6,s1); //초기화된 head1에 값 지정
+		dinsert(head2, m19,b2,m21,s2); //초기화된 head2에 값 지정
+		dinsert(head3, m7,b3,m9,s3); //초기화된 head3에 값 지정
+		dinsert(head4, m10,b4,m12,s4); //초기화된 head4에 값 지정
+		dinsert(head5, m25,b5,m27,s5); //초기화된 head5에 값 지정
+		dinsert(head6, m4,b6,m24,s6); //초기화된 head6에 값 지정
+		dinsert(head7, m13,b7,m9,s7); //초기화된 head7에 값 지정
+		dinsert(head8, m28,b8,m30,s8); //초기화된 head8에 값 지정
+		dinsert(head9, m1,b9,m3,s9); //초기화된 head9에 값 지정
+		dinsert(head10, m16,b10,m18,s10); //초기화된 head10에 값 지정
+		printf("process_id\tprioirty\tcomputing_time\tturnaround_time\n");
+		print_dlist(head1); //head1 출력
+		print_dlist(head2); //head2 출력
+		print_dlist(head3); //head3 출력
+		print_dlist(head4); //head4 출력
+		print_dlist(head5); //head5 출력
+		print_dlist(head6); //head6 출력
+		print_dlist(head7); //head7 출력
+		print_dlist(head8); //head8 출력
+		print_dlist(head9); //head9 출력
+		print_dlist(head10); //head10 출력
+		double average_normal;  //normal1~normal10까지의 평균값 average_normal선언
+		average_normal=(normal1+normal2+normal3+normal4+normal5+normal6+normal7+normal8+normal9+normal10)/MAX_SIZE; //normal1~normal10까지의 평균값 average_normal정의
+		printf("Normalized average Turnaround time:%.1lf",average_normal);
+		printf("\n");
+	 free(head1);  //head1 동적 할당 해제
+	 free(head2); //head2 동적 할당 해제
+	 free(head3); //head3 동적 할당 해제
+	 free(head4); //head4 동적 할당 해제
+	 free(head5); //head5 동적 할당 해제
+	 free(head6);//head6 동적 할당 해제
+	 free(head7); //head7 동적 할당 해제
+	 free(head8); //head8 동적 할당 해제
+	 free(head9); //head9 동적 할당 해제
+	 free(head10); //head10 동적 할당 해제
+	 fclose(fp); //fp txt파일 종료
+	 return 0; 
+}
