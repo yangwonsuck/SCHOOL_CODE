@@ -1,5 +1,5 @@
 #136 single number
-#dictionary 이용
+## dictionary 이용
 
 nums=[2,2,1,1,4]
 nums_dict={}
@@ -12,5 +12,11 @@ for k,v in nums_dict.items():
     if v==1:
         print(k)
 
+## dictionary 에서 key value 값 뽑아내는 함수이용 collections.Counter
+
+import collections
+input=[2,2,1]
+for k,v in collections.Counter(input).items():
+    if v==1: print(k)
 
 #
