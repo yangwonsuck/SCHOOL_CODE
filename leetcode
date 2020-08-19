@@ -1,1 +1,16 @@
+#136 single number
+#dictionary 이용
 
+nums=[2,2,1,1,4]
+nums_dict={}
+for n in nums:
+        try:
+            nums_dict[n]+=1
+        except:
+            nums_dict[n]=1
+for k,v in nums_dict.items():
+    if v==1:
+        print(k)
+
+
+#
