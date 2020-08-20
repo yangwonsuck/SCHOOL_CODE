@@ -19,4 +19,18 @@ input=[2,2,1]
 for k,v in collections.Counter(input).items():
     if v==1: print(k)
 
-#
+#1528 leetcode 만들기
+## enumerate 사용
+s="codeleet"
+indices=[4,5,6,7,0,2,1,3]
+N=len(s)
+a=[""]*N
+print(a)
+for i,x in enumerate(indices):
+    a[x]=s[i]
+    c="".join(a)
+print(a)
+print(s)
+print(c)
+
+
